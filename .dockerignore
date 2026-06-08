@@ -1,0 +1,47 @@
+# --- Lingkungan Virtual (Python) ---
+.venv
+venv
+env
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.pytest_cache
+.coverage
+
+# --- Dependensi & Build (Node.js / Frontend) ---
+node_modules
+build
+dist
+frontend/dist
+
+# --- Data Lokal & Log Aplikasi ---
+backend/mosquitto/data
+backend/mosquitto/log
+*.log
+runs
+tmp
+temp
+thumbnails
+uploads
+
+# --- Konfigurasi IDE & OS ---
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+.git
+.gitignore
+
+# --- File Docker & Environment ---
+.env
+.env.*
+Dockerfile*
+.dockerignore
+docker-compose.yml
+
+# --- File Media Besar ---
+*.mp4
+*.mov
+*.avi
+*.mkv

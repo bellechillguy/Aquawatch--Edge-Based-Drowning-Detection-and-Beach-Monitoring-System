@@ -1,0 +1,42 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: aquawatch
+      POSTGRES_USER: aw_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-aw_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/sql:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: .
+    depends_on:
+      - mosquitto
+      - db
+    environment:
+      DATABASE_URL: postgresql://aw_user:${DB_PASSWORD:-aw_pass}@db/aquawatch
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me}
+      THUMBNAIL_DIR: /var/aquawatch/thumbnails
+    volumes:
+      - thumbnails:/var/aquawatch/thumbnails
+    ports:
+      - "5001:5000"
+
+volumes:
+  postgres_data:
+  thumbnails:

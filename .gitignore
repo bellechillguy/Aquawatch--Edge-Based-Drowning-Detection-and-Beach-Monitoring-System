@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment Variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads / Generated Files
+uploads/
+thumbnails/
+
+# Node
+node_modules/
+
+# Docker
+docker-data/
+postgres-data/
+mosquitto-data/
+
+# YOLO Results
+runs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary
+tmp/
+temp/
+
+# Secrets
+secrets.json
+
+# Model Weights (optional)
+# Uncomment jika model tidak ingin masuk Git
+# *.pt
+# *.pth
+
+*.mp4

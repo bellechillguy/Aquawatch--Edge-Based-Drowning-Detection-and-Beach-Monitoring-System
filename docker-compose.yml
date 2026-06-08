@@ -1,0 +1,61 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./backend/mosquitto/config:/mosquitto/config:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: aquawatch
+      POSTGRES_USER: aw_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-aw_pass}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/sql:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      target: app
+    depends_on:
+      - db
+      - mosquitto
+    environment:
+      DATABASE_URL: postgresql://aw_user:${DB_PASSWORD:-aw_pass}@db/aquawatch
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-me}
+      THUMBNAIL_DIR: /var/aquawatch/thumbnails
+      FRONTEND_DIST_DIR: /app/frontend_dist
+    volumes:
+      - thumbnails:/var/aquawatch/thumbnails
+    ports:
+      - "5001:5000"
+
+  edge:
+    build:
+      context: .
+      target: edge
+    profiles:
+      - edge
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: 1883
+      CAMERA_ID: ${CAMERA_ID:-cam_01}
+      CAMERA_URL: ${CAMERA_URL:-video.mp4}
+      MODEL_PATH: ${MODEL_PATH:-models/best.pt}
+
+volumes:
+  postgres_data:
+  mosquitto_data:
+  mosquitto_log:
+  thumbnails:
