@@ -71,11 +71,18 @@ def _on_alert(app: Flask, camera_id: str, payload: dict) -> None:
 
 def _on_heartbeat(app: Flask, camera_id: str) -> None:
     with app.app_context():
-        db.session.get(Camera, id)
-        if not cam:
-            cam = Camera(id=camera_id)
+        cam = db.session.get(Camera, camera_id)
+
+        if cam is None:
+            cam = Camera(
+                id=camera_id,
+                location_name=f"Camera {camera_id}",
+                is_active=True,
+            )
             db.session.add(cam)
+
         cam.last_heartbeat = datetime.now(UTC)
+
         db.session.commit()
 
 
