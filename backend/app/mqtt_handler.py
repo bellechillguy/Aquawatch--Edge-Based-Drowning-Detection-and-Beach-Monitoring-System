@@ -52,6 +52,17 @@ def _on_alert(app: Flask, camera_id: str, payload: dict) -> None:
             except Exception as exc:  # noqa: BLE001
                 app.logger.warning("Failed to decode thumbnail: %s", exc)
 
+        cam = db.session.get(Camera, camera_id)
+
+        if cam is None:
+            cam = Camera(
+                id=camera_id,
+                location_name=f"Camera {camera_id}",
+                is_active=True,
+            )
+            db.session.add(cam)
+            db.session.commit()
+        
         last_pos = payload.get("last_position") or {}
         alert = Alert(
             camera_id=camera_id,

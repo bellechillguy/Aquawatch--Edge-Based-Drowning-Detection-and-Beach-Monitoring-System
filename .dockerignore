@@ -1,47 +1,53 @@
-# --- Lingkungan Virtual (Python) ---
 .venv
-venv
-env
-__pycache__
-*.pyc
-*.pyo
-*.egg-info
-.pytest_cache
-.coverage
-
-# --- Dependensi & Build (Node.js / Frontend) ---
-node_modules
-build
-dist
+frontend/node_modules
 frontend/dist
-
-# --- Data Lokal & Log Aplikasi ---
 backend/mosquitto/data
 backend/mosquitto/log
-*.log
-runs
-tmp
-temp
-thumbnails
-uploads
-
-# --- Konfigurasi IDE & OS ---
-.vscode
-.idea
+__pycache__
+*.pyc
+.pytest_cache
 .DS_Store
-Thumbs.db
 .git
 .gitignore
 
-# --- File Docker & Environment ---
+.venv
+venv
+env
+
+__pycache__
+*.pyc
+*.pyo
+
+.pytest_cache
+.coverage
+
+.vscode
+.idea
+
+node_modules
+
+build
+dist
+*.egg-info
+
 .env
 .env.*
-Dockerfile*
-.dockerignore
-docker-compose.yml
 
-# --- File Media Besar ---
+*.log
+
+runs
+tmp
+temp
+
+thumbnails
+uploads
+
+.DS_Store
+Thumbs.db
+
 *.mp4
 *.mov
 *.avi
 *.mkv
+
+docker-compose.yml

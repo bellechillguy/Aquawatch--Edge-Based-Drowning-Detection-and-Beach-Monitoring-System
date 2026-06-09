@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from app import db
-from app.models import Camera
+from app.models import Camera, Alert
 
 bp = Blueprint("cameras", __name__)
 
@@ -12,7 +12,19 @@ bp = Blueprint("cameras", __name__)
 @bp.get("")
 @jwt_required()
 def list_cameras():
-    return jsonify([c.to_dict() for c in Camera.query.all()])
+    cams = []
+
+    for c in Camera.query.all():
+        data = c.to_dict()
+
+        data["active_alerts"] = Alert.query.filter_by(
+            camera_id=c.id,
+            status="active"
+        ).count()
+
+        cams.append(data)
+
+    return jsonify(cams)
 
 
 @bp.post("")

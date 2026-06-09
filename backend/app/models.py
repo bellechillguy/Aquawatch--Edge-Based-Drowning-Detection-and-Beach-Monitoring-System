@@ -31,11 +31,18 @@ class Camera(db.Model):
             "last_heartbeat": self.last_heartbeat.isoformat() if self.last_heartbeat else None,
             "online": self._is_online(),
         }
-
+    
+    
     def _is_online(self) -> bool:
         if not self.last_heartbeat:
             return False
-        return (datetime.now(UTC) - self.last_heartbeat).total_seconds() < 90
+
+        heartbeat = self.last_heartbeat
+
+        if heartbeat.tzinfo is None:
+            heartbeat = heartbeat.replace(tzinfo=UTC)
+
+        return (datetime.now(UTC) - heartbeat).total_seconds() < 90
 
 
 class Alert(db.Model):

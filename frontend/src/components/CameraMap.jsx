@@ -14,7 +14,15 @@ export default function CameraMap() {
       <h2>Kamera</h2>
       <table>
         <thead>
-          <tr><th>ID</th><th>Lokasi</th><th>Koordinat</th><th>Threshold</th><th>Status</th><th></th></tr>
+          <tr>
+            <th>ID</th>
+            <th>Lokasi</th>
+            <th>Koordinat</th>
+            <th>Threshold</th>
+            <th>Status</th>
+            <th>Alert Aktif</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
           {cams.map((c) => (
@@ -23,9 +31,12 @@ export default function CameraMap() {
               <td>{c.location_name}</td>
               <td>{c.lat}, {c.lng}</td>
               <td>{c.disappear_threshold}s</td>
-              <td><span className={`badge ${c.online ? "resolved" : "active"}`}>
-                {c.online ? "online" : "offline"}
-              </span></td>
+              <td>
+                <span className={`badge ${c.online ? "resolved" : "active"}`}>
+                  {c.online ? "online" : "offline"}
+                </span>
+              </td>
+              <td>{c.active_alerts}</td>
               <td><button onClick={() => setEditing(c)}>Konfigurasi</button></td>
             </tr>
           ))}

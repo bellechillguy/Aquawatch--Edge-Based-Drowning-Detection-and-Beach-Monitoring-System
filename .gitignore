@@ -63,9 +63,6 @@ temp/
 # Secrets
 secrets.json
 
-# Model Weights (optional)
-# Uncomment jika model tidak ingin masuk Git
-# *.pt
-# *.pth
-
 *.mp4
+edge/*.mp4
+*.zip

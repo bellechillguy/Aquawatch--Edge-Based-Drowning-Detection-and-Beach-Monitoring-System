@@ -1,16 +1,36 @@
-import { useEffect, useState } from "react";
-import { fetchAlerts, updateAlert } from "../services/api.js";
+import { useMemo, useEffect, useState } from "react";
+import { updateAlert } from "../services/api.js";
+import { useAlerts } from "../context/AlertContext.jsx";
 
 export default function AlertHistory() {
-  const [rows, setRows] = useState([]);
-  const [filter, setFilter] = useState({ status: "", camera_id: "" });
+  const { alerts, reload } = useAlerts();
+  const [filter, setFilter] = useState({
+    status: "",
+    camera_id: ""
+  });
 
-  const load = async () => setRows(await fetchAlerts(filter));
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [filter]);
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  const rows = useMemo(() => {
+    return alerts.filter((a) => {
+      const statusOk =
+        !filter.status || a.status === filter.status;
+
+      const cameraOk =
+        !filter.camera_id ||
+        (a.camera_id ?? "")
+          .toLowerCase()
+          .includes(filter.camera_id.toLowerCase());
+
+      return statusOk && cameraOk;
+    });
+  }, [alerts, filter]);
 
   const act = async (id, status) => {
     await updateAlert(id, status);
-    load();
+    reload();
   };
 
   return (
