@@ -4,6 +4,8 @@ AquaWatch is an AI-powered drowning detection and monitoring system that combine
 
 The system uses YOLOv8 for human detection, DeepSORT for object tracking, and a rule-based drowning detection engine to identify potential drowning incidents. Alerts are sent through MQTT, stored in PostgreSQL, and delivered to a web dashboard in real time using Socket.IO.
 
+<img width="1068" height="584" alt="Image" src="https://github.com/user-attachments/assets/334a8aea-a8da-45dd-99b1-a67a66def091" />
+
 ## Features
 
 * Real-time human detection using YOLOv8
