@@ -123,12 +123,31 @@ def test_patch_false_alarm(client, app):
     assert data["resolved_by"] == "lg1"
 
 
+def test_alert_thumbnail_endpoint(client, app):
+    token = _token(client)
+    thumbnail = Path(app.config["THUMBNAIL_DIR"]) / "alert_preview.jpg"
+    thumbnail.parent.mkdir(parents=True, exist_ok=True)
+    thumbnail.write_bytes(b"fake-jpeg")
+
+    with app.app_context():
+        alert = Alert(camera_id="cam_01", track_id=9, thumbnail_path=str(thumbnail))
+        db.session.add(alert)
+        db.session.commit()
+        aid = alert.id
+
+    r = client.get(f"/api/alerts/{aid}/thumbnail", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert r.mimetype == "image/jpeg"
+    assert r.data == b"fake-jpeg"
+
+
 def test_camera_validation_and_heartbeat_status(client, app):
     token = _token(client)
     headers = {"Authorization": f"Bearer {token}"}
 
     assert client.post("/api/cameras", json={}, headers=headers).status_code == 400
     assert client.post("/api/cameras", json={"id": "cam_01"}, headers=headers).status_code == 409
+    assert client.get("/api/cameras/missing", headers=headers).status_code == 404
     assert client.put("/api/cameras/cam_01/config", json={"disappear_threshold": 0}, headers=headers).status_code == 400
 
     handle_mqtt_message(app, "aquawatch/cam_new/heartbeat", b"{}")

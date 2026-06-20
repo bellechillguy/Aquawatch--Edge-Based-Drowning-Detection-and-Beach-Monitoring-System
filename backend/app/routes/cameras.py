@@ -59,6 +59,8 @@ def create_camera():
 @jwt_required()
 def get_camera(camera_id: str):
     cam = db.session.get(Camera, camera_id)
+    if cam is None:
+        return jsonify({"error": "camera not found"}), 404
     return jsonify(cam.to_dict())
 
 

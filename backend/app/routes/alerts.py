@@ -1,6 +1,8 @@
 """Alert endpoints: list, filter, resolve / mark false alarm."""
 from datetime import datetime, UTC
-from flask import Blueprint, request, jsonify, abort
+from pathlib import Path
+
+from flask import Blueprint, request, jsonify, abort, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db, socketio
 from app.models import Alert
@@ -59,6 +61,25 @@ def get_alert(alert_id: int):
         abort(404)
 
     return jsonify(alert.to_dict())
+
+
+@bp.get("/<int:alert_id>/thumbnail")
+@jwt_required()
+def get_alert_thumbnail(alert_id: int):
+    alert = db.session.get(Alert, alert_id)
+
+    if alert is None:
+        abort(404)
+
+    if not alert.thumbnail_path:
+        return jsonify({"error": "thumbnail not available"}), 404
+
+    thumbnail = Path(alert.thumbnail_path)
+    if not thumbnail.is_file():
+        return jsonify({"error": "thumbnail file not found"}), 404
+
+    return send_file(thumbnail, mimetype="image/jpeg")
+
 
 @bp.patch("/<int:alert_id>")
 @jwt_required()
