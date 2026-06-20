@@ -1,7 +1,7 @@
 """AquaWatch edge runtime — runs on Raspberry Pi.
 
 Pipeline per spec 6a:
-  Video Capture -> Preprocess -> YOLOv8 -> DeepSORT ->
+  Video Capture -> Preprocess -> YOLOv26 -> DeepSORT ->
   Zone Classifier -> Drowning Logic Engine -> (MQTT + GPIO buzzer/LED)
 """
 import base64
@@ -17,7 +17,7 @@ import numpy as np
 import paho.mqtt.client as mqtt
 import torch
 
-# Monkey patch torch.load for PyTorch 2.6+ compatibility with YOLOv8 weights loading
+# Monkey patch torch.load for PyTorch 2.6+ compatibility with YOLOv26 weights loading
 _orig_load = torch.load
 def _patched_load(*args, **kwargs):
     if "weights_only" not in kwargs:
@@ -188,7 +188,7 @@ class DrowningEngine:
 # ---------- Main loop ----------------------------------------------------- #
 def main() -> None:
     gpio_init()
-    log.info("Loading YOLOv8 model from %s", CONFIG["MODEL_PATH"])
+    log.info("Loading YOLOv26 model from %s", CONFIG["MODEL_PATH"])
     model = YOLO(CONFIG["MODEL_PATH"])
     tracker = DeepSort(max_age=CONFIG["MAX_AGE_FRAMES"])
 
@@ -360,18 +360,20 @@ def main() -> None:
             2,
         )
 
-        cv2.imshow(
-            "AquaWatch Detection",
-            resized,
-        )
+        if CONFIG["DISPLAY_PREVIEW"]:
+            cv2.imshow(
+                "AquaWatch Detection",
+                resized,
+            )
 
-        key = cv2.waitKey(1)
+            key = cv2.waitKey(1)
 
-        if key & 0xFF == ord("q"):
-            break
+            if key & 0xFF == ord("q"):
+                break
 
     cap.release()
-    cv2.destroyAllWindows()
+    if CONFIG["DISPLAY_PREVIEW"]:
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     try:

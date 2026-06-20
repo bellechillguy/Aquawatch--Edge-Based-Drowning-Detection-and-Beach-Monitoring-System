@@ -5,7 +5,8 @@ import os
 CONFIG = {
     "CAMERA_ID": os.getenv("CAMERA_ID", "cam_01"),
     "CAMERA_URL": os.getenv("CAMERA_URL", "pool_test.mp4"),
-    "MODEL_PATH": os.getenv("MODEL_PATH", "models/best.pt"),
+    "MODEL_PATH": os.getenv("MODEL_PATH", "yolo26n.pt"),
+    "DISPLAY_PREVIEW": os.getenv("DISPLAY_PREVIEW", "0").lower() in {"1", "true", "yes", "on"},
     "MQTT_BROKER": os.getenv("MQTT_BROKER", "localhost"),
     "MQTT_PORT": int(os.getenv("MQTT_PORT", "1883")),
     "DISAPPEAR_THRESHOLD_SECONDS": int(os.getenv("DISAPPEAR_THRESHOLD", "15")),

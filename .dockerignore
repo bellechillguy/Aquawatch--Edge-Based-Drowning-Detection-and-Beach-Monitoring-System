@@ -49,5 +49,6 @@ Thumbs.db
 *.mov
 *.avi
 *.mkv
+!edge/pool_test.mp4
 
 docker-compose.yml

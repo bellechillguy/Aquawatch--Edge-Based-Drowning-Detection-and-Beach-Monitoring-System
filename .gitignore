@@ -5,6 +5,7 @@ __pycache__/
 
 # Virtual Environment
 .venv/
+.venv-edge/
 venv/
 env/
 
@@ -52,6 +53,7 @@ mosquitto-data/
 
 # YOLO Results
 runs/
+*.pt
 
 # Jupyter
 .ipynb_checkpoints/

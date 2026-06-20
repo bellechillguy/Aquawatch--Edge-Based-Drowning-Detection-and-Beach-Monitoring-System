@@ -12,11 +12,14 @@ export default function AlertPanel() {
 
   return (
     <div className="alert-popup" role="alertdialog">
-      <h3>⚠️ Potensi Tenggelam</h3>
-      <div>Kamera: <strong>{activePopup.camera_id}</strong></div>
-      <div>Track ID: {activePopup.track_id}</div>
-      <div>Hilang selama: {activePopup.disappear_duration_seconds?.toFixed(1)}s</div>
-      <div>Posisi: ({activePopup.last_position?.x}, {activePopup.last_position?.y})</div>
+      <p className="eyebrow">Critical alert</p>
+      <h3>Potensi tenggelam</h3>
+      <div className="alert-detail-grid">
+        <span>Kamera</span><strong>{activePopup.camera_id}</strong>
+        <span>Track</span><strong>{activePopup.track_id}</strong>
+        <span>Durasi</span><strong>{activePopup.disappear_duration_seconds?.toFixed(1)}s</strong>
+        <span>Posisi</span><strong>({activePopup.last_position?.x}, {activePopup.last_position?.y})</strong>
+      </div>
       <div className="row">
         <button onClick={() => resolve("resolved")}>Sudah Ditangani</button>
         <button className="ghost" onClick={() => resolve("false_alarm")}>False Alarm</button>

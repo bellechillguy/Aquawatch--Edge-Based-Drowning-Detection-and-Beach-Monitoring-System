@@ -1,9 +1,10 @@
 import { useMemo, useEffect, useState } from "react";
-import { updateAlert } from "../services/api.js";
+import { fetchAlertThumbnail, updateAlert } from "../services/api.js";
 import { useAlerts } from "../context/AlertContext.jsx";
 
 export default function AlertHistory() {
   const { alerts, reload } = useAlerts();
+  const [preview, setPreview] = useState(null);
   const [filter, setFilter] = useState({
     status: "",
     camera_id: ""
@@ -33,10 +34,41 @@ export default function AlertHistory() {
     reload();
   };
 
+  const openPreview = async (alert) => {
+    if (preview?.url) {
+      URL.revokeObjectURL(preview.url);
+    }
+
+    const blob = await fetchAlertThumbnail(alert.id);
+    const url = URL.createObjectURL(blob);
+    setPreview({ alert, url });
+  };
+
+  const closePreview = () => {
+    if (preview?.url) {
+      URL.revokeObjectURL(preview.url);
+    }
+    setPreview(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (preview?.url) {
+        URL.revokeObjectURL(preview.url);
+      }
+    };
+  }, [preview]);
+
   return (
-    <div className="card">
-      <h2>Riwayat Alert</h2>
-      <div style={{ display: "flex", gap: 8, margin: "12px 0" }}>
+    <div className="card table-card">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Incident timeline</p>
+          <h2>Riwayat Alert</h2>
+        </div>
+        <span className="count-pill">{rows.length} alert</span>
+      </div>
+      <div className="toolbar">
         <select value={filter.status} onChange={(e) => setFilter({ ...filter, status: e.target.value })}>
           <option value="">Semua status</option>
           <option value="active">Active</option>
@@ -49,35 +81,60 @@ export default function AlertHistory() {
           onChange={(e) => setFilter({ ...filter, camera_id: e.target.value })}
         />
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>Kamera</th><th>Track</th><th>Waktu</th>
-            <th>Durasi (s)</th><th>Status</th><th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((a) => (
-            <tr key={a.id}>
-              <td>{a.id}</td>
-              <td>{a.camera_id}</td>
-              <td>{a.track_id}</td>
-              <td>{new Date(a.triggered_at).toLocaleString()}</td>
-              <td>{a.disappear_duration_seconds?.toFixed(1)}</td>
-              <td><span className={`badge ${a.status}`}>{a.status}</span></td>
-              <td>
-                {a.status === "active" && (
-                  <>
-                    <button onClick={() => act(a.id, "resolved")}>Resolve</button>{" "}
-                    <button className="ghost" onClick={() => act(a.id, "false_alarm")}>False</button>
-                  </>
-                )}
-              </td>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Kamera</th><th>Track</th><th>Waktu</th>
+              <th>Durasi</th><th>Status</th><th>Aksi</th>
             </tr>
-          ))}
-          {rows.length === 0 && <tr><td colSpan={7} style={{ textAlign: "center", padding: 24 }}>Belum ada data</td></tr>}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((a) => (
+              <tr key={a.id}>
+                <td><span className="mono">#{a.id}</span></td>
+                <td>{a.camera_id}</td>
+                <td>{a.track_id}</td>
+                <td>{new Date(a.triggered_at).toLocaleString()}</td>
+                <td>{a.disappear_duration_seconds?.toFixed(1)}s</td>
+                <td><span className={`badge ${a.status}`}>{a.status}</span></td>
+                <td>
+                  <div className="action-group">
+                    {a.thumbnail_path && (
+                      <button className="secondary small" onClick={() => openPreview(a)}>Preview</button>
+                    )}
+                    {a.status === "active" && (
+                      <>
+                        <button className="small" onClick={() => act(a.id, "resolved")}>Resolve</button>
+                        <button className="ghost small" onClick={() => act(a.id, "false_alarm")}>False</button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={7} className="empty-state">Belum ada data alert</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {preview && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="preview-modal">
+            <div className="preview-header">
+              <div>
+                <h3>Preview Alert #{preview.alert.id}</h3>
+                <p>Kamera {preview.alert.camera_id} - Track {preview.alert.track_id}</p>
+              </div>
+              <button className="ghost" onClick={closePreview}>Tutup</button>
+            </div>
+            <img src={preview.url} alt={`Preview alert ${preview.alert.id}`} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

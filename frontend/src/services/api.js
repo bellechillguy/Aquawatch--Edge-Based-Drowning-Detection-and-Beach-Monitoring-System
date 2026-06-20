@@ -19,6 +19,9 @@ export const fetchAlerts = (params = {}) =>
 export const updateAlert = (id, status) =>
   api.patch(`/alerts/${id}`, { status }).then((r) => r.data);
 
+export const fetchAlertThumbnail = (id) =>
+  api.get(`/alerts/${id}/thumbnail`, { responseType: "blob" }).then((r) => r.data);
+
 export const fetchCameras = () => api.get("/cameras").then((r) => r.data);
 
 export const updateCameraConfig = (id, payload) =>

@@ -3,6 +3,7 @@ import { NavLink, Navigate, Route, Routes, useNavigate } from "react-router-dom"
 import AlertPanel from "./components/AlertPanel.jsx";
 import AlertHistory from "./components/AlertHistory.jsx";
 import CameraMap from "./components/CameraMap.jsx";
+import { useAlerts } from "./context/AlertContext.jsx";
 import { login } from "./services/api.js";
 
 function RequireAuth({ children }) {
@@ -29,22 +30,77 @@ function Login() {
   };
 
   return (
-    <div className="container login">
-      <div className="card">
-        <h2>AquaWatch Login</h2>
-        <form onSubmit={submit} style={{ marginTop: 16 }}>
-          <input placeholder="username" value={u} onChange={(e) => setU(e.target.value)} />
-          <input placeholder="password" type="password" value={p} onChange={(e) => setP(e.target.value)} />
-          {err && <div style={{ color: "#f87171", marginBottom: 8 }}>{err}</div>}
-          <button type="submit" style={{ width: "100%" }}>Masuk</button>
+    <div className="login-page">
+      <div className="login-shell">
+        <div className="brand-lockup">
+          <span className="brand-mark">AW</span>
+          <span>AquaWatch</span>
+        </div>
+        <h1>Kolam aman, keputusan lebih cepat.</h1>
+        <p>Masuk untuk memantau kamera, alert tenggelam, dan status edge device secara real time.</p>
+        <form className="login-card" onSubmit={submit}>
+          <label>
+            Username
+            <input placeholder="admin" value={u} onChange={(e) => setU(e.target.value)} />
+          </label>
+          <label>
+            Password
+            <input placeholder="aquawatch" type="password" value={p} onChange={(e) => setP(e.target.value)} />
+          </label>
+          {err && <div className="form-error">{err}</div>}
+          <button type="submit">Masuk dashboard</button>
         </form>
       </div>
     </div>
   );
 }
 
+function DashboardHome() {
+  const { alerts } = useAlerts();
+  const active = alerts.filter((a) => a.status === "active").length;
+  const resolved = alerts.filter((a) => a.status === "resolved").length;
+  const latest = alerts[0];
+
+  return (
+    <>
+      <section className="page-hero">
+        <div>
+          <p className="eyebrow">Live safety operations</p>
+          <h1>Monitoring deteksi tenggelam</h1>
+          <p className="hero-copy">
+            Pantau status kamera, alert aktif, dan preview frame deteksi dari edge AI dalam satu dashboard.
+          </p>
+        </div>
+        <div className="metric-strip" aria-label="Ringkasan alert">
+          <div className="metric-card danger">
+            <span>Alert aktif</span>
+            <strong>{active}</strong>
+          </div>
+          <div className="metric-card">
+            <span>Ditangani</span>
+            <strong>{resolved}</strong>
+          </div>
+          <div className="metric-card wide">
+            <span>Alert terbaru</span>
+            <strong>{latest ? `#${latest.id}` : "Belum ada"}</strong>
+          </div>
+        </div>
+      </section>
+      <CameraMap />
+      <AlertHistory />
+    </>
+  );
+}
+
 function Shell() {
   const nav = useNavigate();
+  const storedUser = localStorage.getItem("aw_user");
+  let user = null;
+  try {
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    user = null;
+  }
   const logout = () => {
     localStorage.removeItem("aw_token");
     localStorage.removeItem("aw_user");
@@ -53,17 +109,23 @@ function Shell() {
   return (
     <div className="app">
       <header className="topbar">
-        <div style={{ fontWeight: 700, fontSize: 18 }}>🌊 AquaWatch</div>
+        <div className="brand-lockup">
+          <span className="brand-mark">AW</span>
+          <span>AquaWatch</span>
+        </div>
         <nav>
           <NavLink to="/" end>Dashboard</NavLink>
           <NavLink to="/history">Riwayat</NavLink>
           <NavLink to="/cameras">Kamera</NavLink>
         </nav>
-        <button className="ghost" onClick={logout}>Logout</button>
+        <div className="topbar-actions">
+          <span className="user-chip">{user?.username ?? "operator"}</span>
+          <button className="ghost" onClick={logout}>Logout</button>
+        </div>
       </header>
       <main className="container">
         <Routes>
-          <Route path="/" element={<><CameraMap /><AlertHistory /></>} />
+          <Route path="/" element={<DashboardHome />} />
           <Route path="/history" element={<AlertHistory />} />
           <Route path="/cameras" element={<CameraMap />} />
         </Routes>

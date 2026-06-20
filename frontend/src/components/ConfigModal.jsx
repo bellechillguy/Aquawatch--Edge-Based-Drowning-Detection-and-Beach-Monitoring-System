@@ -19,24 +19,27 @@ export default function ConfigModal({ camera, onClose, onSaved }) {
   };
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,.6)",
-      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100,
-    }}>
-      <div className="card" style={{ width: 480 }}>
-        <h3>Konfigurasi {camera.id}</h3>
-        <div style={{ margin: "12px 0" }}>
-          <label>Disappear Threshold (detik)</label><br />
-          <input type="number" value={threshold} onChange={(e) => setThreshold(e.target.value)} />
+    <div className="modal-backdrop" role="dialog" aria-modal="true">
+      <div className="form-modal">
+        <div className="preview-header">
+          <div>
+            <p className="eyebrow">Camera config</p>
+            <h3>Konfigurasi {camera.id}</h3>
+          </div>
+          <button className="ghost small" onClick={onClose}>Tutup</button>
         </div>
-        <div style={{ margin: "12px 0" }}>
-          <label>Zone Polygon (JSON array of [x,y])</label>
+        <label className="field">
+          Disappear Threshold (detik)
+          <input type="number" value={threshold} onChange={(e) => setThreshold(e.target.value)} />
+        </label>
+        <label className="field">
+          Zone Polygon (JSON array of [x,y])
           <textarea
-            rows={8} style={{ width: "100%", fontFamily: "monospace" }}
+            rows={8}
             value={polygon} onChange={(e) => setPolygon(e.target.value)}
           />
-        </div>
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        </label>
+        <div className="modal-actions">
           <button className="ghost" onClick={onClose}>Batal</button>
           <button onClick={save}>Simpan</button>
         </div>
